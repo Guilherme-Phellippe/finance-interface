@@ -13,10 +13,10 @@ export default defineConfig({
       },
       manifest: {
         name: 'Finance App',
-        short_name: 'App',
+        short_name: 'Finance App',
         description: 'A Progressive Web App built with Vite',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        theme_color: '#000000',
+        background_color: '#000000',
         start_url: '/',
         display: 'standalone',
         icons: [
