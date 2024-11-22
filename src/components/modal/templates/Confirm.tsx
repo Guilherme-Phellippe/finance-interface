@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button } from "../../Button/Button";
 
 interface Confirm {
     title: string,

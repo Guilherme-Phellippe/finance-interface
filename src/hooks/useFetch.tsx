@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios"
+import axios from "axios"
 import { useEffect, useState } from "react"
 const server_url = import.meta.env.VITE_SERVER_HOST;
 
