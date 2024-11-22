@@ -21,14 +21,14 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: 'https://t3.ftcdn.net/jpg/04/93/95/60/360_F_493956028_lkyGavS5R600BEJRlKjDGeECew6nY1OQ.jpg',
+            src: 'https://i.ibb.co/sqLhLkc/people-finance-around-the-world-logo.png',
             sizes: '192x192',
-            type: 'image/jpg',
+            type: 'image/png',
           },
           {
-            src: 'https://t3.ftcdn.net/jpg/04/93/95/60/360_F_493956028_lkyGavS5R600BEJRlKjDGeECew6nY1OQ.jpg',
+            src: 'https://i.ibb.co/sqLhLkc/people-finance-around-the-world-logo.png',
             sizes: '512x512',
-            type: 'image/jpg',
+            type: 'image/png',
           },
         ],
       },
