@@ -19,7 +19,7 @@ import { Input } from "./components/Input/Input";
 
 export default function App() {
   const { setModalContent } = useContext(ModalContext);
-  const { getDay, formatRealValue } = useFormat();
+  const { formatSimpleDate, formatRealValue } = useFormat();
   const { state: { data: debts, loading } } = useFetch<Debts[]>({ route: "/debts" });
   const { state: balanceData } = useFetch<Balance[]>({ route: "/balances/current-month" });
   const { debtsMetric, balanceMetric, getCurrentDebitPayment, erningsPerDay } = useMetric();
@@ -186,7 +186,7 @@ export default function App() {
             ></div>
             <span className="w-1/3">{debt.title}</span>
             <span className="w-1/3">{formatRealValue(debt.value)}</span>
-            <span className="w-1/3">{getDay(getCurrentDebitPayment(debt)?.payment_in)}</span>
+            <span className="w-1/3">{formatSimpleDate(getCurrentDebitPayment(debt)?.payment_in)}</span>
             <MdMoney
               className="fill-green-800 bg-green-200 rounded-full size-6 cursor-pointer"
               onClick={() => handlePayDebt(getCurrentDebitPayment(debt)?.id)}
@@ -207,7 +207,7 @@ export default function App() {
           >
             <span className="w-1/3">{balance.description}</span>
             <span className="w-1/3">{formatRealValue(balance.value)}</span>
-            <span className="w-1/3">{getDay(balance.created_at)}</span>
+            <span className="w-1/3">{formatSimpleDate(balance.created_at)}</span>
             <MdDelete
               className="fill-red-800 bg-red-200 rounded-full size-6 cursor-pointer"
               onClick={() => handleDeleteBalance(balance.id)}
