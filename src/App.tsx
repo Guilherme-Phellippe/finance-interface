@@ -20,7 +20,7 @@ import { Input } from "./components/Input/Input";
 export default function App() {
   const { setModalContent } = useContext(ModalContext);
   const { getDay, formatRealValue } = useFormat();
-  const { state: { data: debts } } = useFetch<Debts[]>({ route: "/debts" });
+  const { state: { data: debts, loading } } = useFetch<Debts[]>({ route: "/debts" });
   const { state: balanceData } = useFetch<Balance[]>({ route: "/balances/current-month" });
   const { debtsMetric, balanceMetric, getCurrentDebitPayment, erningsPerDay } = useMetric();
   const [dateToCalc, setDateToCalc] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString()) // Define o mês todo para o calculo
@@ -125,6 +125,9 @@ export default function App() {
 
 
   return (
+    loading && balanceData.loading ? 
+    <span>carregando...</span>
+    :
     <div className="p-4 w-screen min-h-screen max-w-[480px] bg-slate-800 mx-auto flex flex-col gap-4 items-center text-white">
       <h1 className="text-3xl font-bold uppercase p-3">finance app</h1>
       <div className="w-full flex flex-wrap gap-4 justify-evenly">
