@@ -1,7 +1,8 @@
 export function useFormat() {
 
     const formatSimpleDate = (date: string | undefined) => {
-        const currentDate = date ? new Date(date) : new Date();
+        if(!date) return;
+        const currentDate = new Date(date);
         const newDate = `${currentDate.getDate().toString().padStart(2, "0")}-${currentDate.getMonth().toString().padStart(2, "0")}-${currentDate.getFullYear()}`
         return newDate
     }
