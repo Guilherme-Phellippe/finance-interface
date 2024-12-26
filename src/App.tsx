@@ -175,7 +175,6 @@ export default function App() {
 
       <div className="flex flex-col gap-3 max-h-[300px] w-full overflow-auto border border-slate-500 p-4 rounded-md">
         {debts?.map(debt =>
-          getCurrentDebitPayment(debt) &&
           <div
             key={debt.id}
             data-isactive={new Date(debt.debts_payment[0].payment_in).getDate() <= new Date(dateToCalc).getDate()}
