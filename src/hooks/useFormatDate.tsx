@@ -1,10 +1,15 @@
 export function useFormat() {
 
-    const formatDate = (date: string | undefined) => {
-
+    const formatSimpleDate = (date: string | undefined) => {
         const currentDate = date ? new Date(date) : new Date();
         const newDate = `${currentDate.getDate().toString().padStart(2, "0")}-${currentDate.getMonth().toString().padStart(2, "0")}-${currentDate.getFullYear()}`
         return newDate
+    }
+
+    const getDay = (date: string | undefined) => {
+        if(!date) return;
+        const day = (new Date(date).getDate() + 1).toString().padStart(2, "0")
+        return day
     }
 
 
@@ -13,7 +18,8 @@ export function useFormat() {
     }
 
     return {
-        formatDate,
+        formatSimpleDate,
+        getDay,
         formatRealValue
     }
 };

@@ -1,5 +1,5 @@
 import "./index.css"
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Debts } from "./@types/debts.types";
 import { Box } from "./components/Box/Box"
 import { Button } from "./components/Button/Button";
@@ -15,13 +15,16 @@ import { FormAddBalance } from "./components/FormAddBalance/FormAddBalance";
 import { Balance } from "./@types/balance.types";
 import { useMetric } from "./hooks/useMetric";
 import { deleteBalance } from "./api/balance.api";
+import { Input } from "./components/Input/Input";
 
 export default function App() {
   const { setModalContent } = useContext(ModalContext);
-  const { formatDate, formatRealValue } = useFormat();
-  const { state } = useFetch<Debts[]>({ route: "/debts" });
+  const { getDay, formatRealValue } = useFormat();
+  const { state: { data: debts } } = useFetch<Debts[]>({ route: "/debts" });
   const { state: balanceData } = useFetch<Balance[]>({ route: "/balances/current-month" });
   const { debtsMetric, balanceMetric, getCurrentDebitPayment, erningsPerDay } = useMetric();
+  const [dateToCalc, setDateToCalc] = useState(new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString()) // Define o mês todo para o calculo
+  const [timeOffInDays, setTimeOffInDays] = useState(0);
 
 
   const handleCreateDebt = () => {
@@ -124,42 +127,56 @@ export default function App() {
   return (
     <div className="p-4 w-screen min-h-screen max-w-[480px] bg-slate-800 mx-auto flex flex-col gap-4 items-center text-white">
       <h1 className="text-3xl font-bold uppercase p-3">finance app</h1>
-      <div className="w-full flex flex-wrap justify-evenly">
+      <div className="w-full flex flex-wrap gap-4 justify-evenly">
+
+        <Input
+          type="date"
+          placeholder="Calculo"
+          style={{ width: "75%" }}
+          onChange={(e) => setDateToCalc(new Date(e.target.value).toISOString())}
+        />
+
+        <Input
+          type="number"
+          min={0}
+          max={31}
+          placeholder="Folgas"
+          onChange={(e)=> setTimeOffInDays(Number(e.target.value || "0"))}
+          style={{ width: "20%" }}
+        />
+
+
         <Box
           title="Saldo"
           value={`R$ ${balanceMetric(balanceData.data).balances.toFixed(2).replace(".", ",")}`}
         />
         <Box
-          title="Contas"
-          value={`R$ ${debtsMetric(state.data).debtsTotal.toFixed(2).replace(".", ",")}`}
+          title="Contas total"
+          value={`R$ ${debtsMetric(debts).debtsTotal.toFixed(2).replace(".", ",")}`}
           isNegative
         />
+
         <Box
           title="Contas hà pagar"
-          value={`R$ ${debtsMetric(state.data).debtsCurrentMonth.toFixed(2).replace(".", ",")}`}
+          value={`R$ ${debtsMetric(debts).debtsCurrentMonth.toFixed(2).replace(".", ",")}`}
           isNegative
         />
 
         <Box
-          title="Você precisa fazer sem folga"
-          value={`R$ ${erningsPerDay({ balances: balanceData.data, debts: state.data, timeOff: false })}/dia`}
-          width="w-4/5"
-          isNegative
-        />
-
-        <Box
-          title="Você precisa fazer com folga"
-          value={`R$ ${erningsPerDay({ balances: balanceData.data, debts: state.data, timeOff: true })}/dia`}
+          title="Objetivo diário"
+          value={`R$ ${erningsPerDay({ balances: balanceData.data, debts, dateToCalc, timeOffInDays })}/dia`}
           width="w-4/5"
           isNegative
         />
       </div>
 
       <div className="flex flex-col gap-3 max-h-[300px] w-full overflow-auto border border-slate-500 p-4 rounded-md">
-        {state.data?.map(debt =>
+        {debts?.map(debt =>
+          getCurrentDebitPayment(debt) &&
           <div
             key={debt.id}
-            className="w-full flex gap-2 justify-start items-center"
+            data-isactive={new Date(debt.debts_payment[0].payment_in).getDate() <= new Date(dateToCalc).getDate()}
+            className="w-full flex gap-2 justify-start items-center data-[isactive=false]:opacity-30"
           >
             <div
               data-paid={getCurrentDebitPayment(debt)?.is_paid}
@@ -167,7 +184,7 @@ export default function App() {
             ></div>
             <span className="w-1/3">{debt.title}</span>
             <span className="w-1/3">{formatRealValue(debt.value)}</span>
-            <span className="w-1/3">{formatDate(getCurrentDebitPayment(debt)?.payment_in)}</span>
+            <span className="w-1/3">{getDay(getCurrentDebitPayment(debt)?.payment_in)}</span>
             <MdMoney
               className="fill-green-800 bg-green-200 rounded-full size-6 cursor-pointer"
               onClick={() => handlePayDebt(getCurrentDebitPayment(debt)?.id)}
@@ -188,10 +205,10 @@ export default function App() {
           >
             <span className="w-1/3">{balance.description}</span>
             <span className="w-1/3">{formatRealValue(balance.value)}</span>
-            <span className="w-1/3">{formatDate(balance.created_at)}</span>
+            <span className="w-1/3">{getDay(balance.created_at)}</span>
             <MdDelete
               className="fill-red-800 bg-red-200 rounded-full size-6 cursor-pointer"
-              onClick={()=> handleDeleteBalance(balance.id)}
+              onClick={() => handleDeleteBalance(balance.id)}
             />
           </div>
         )}
