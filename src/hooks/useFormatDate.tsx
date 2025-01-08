@@ -1,9 +1,13 @@
+const monthsToText = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
 export function useFormat() {
 
     const formatSimpleDate = (date: string | undefined) => {
-        if(!date) return;
+        if(!date) return `Sem data`;
         const currentDate = new Date(date);
-        const newDate = `${currentDate.getDate().toString().padStart(2, "0")}-${currentDate.getMonth().toString().padStart(2, "0")}-${currentDate.getFullYear()}`
+        currentDate.setDate(currentDate.getDate() + 1)
+        const monthToText = monthsToText[currentDate.getMonth()];
+        const newDate = `${currentDate.getDate().toString().padStart(2, "0")} de ${monthToText}`
         return newDate
     }
 
