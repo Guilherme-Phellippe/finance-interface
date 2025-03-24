@@ -152,7 +152,7 @@ export function Finance({ }: Finance) {
                         <div
                             key={debt.id}
                             data-isselected={!!selectDebt?.find(select => select.id === debt.id)}
-                            className="w-full flex gap-2 justify-start items-center data-[isselected=true]:bg-blue-800 p-2"
+                            className="w-full flex gap-2 justify-start items-center data-[isselected=true]:bg-blue-800 py-2 px-1"
                         >
                             <div
                                 data-paid={getCurrentDebitPayment(debt)?.is_paid}
