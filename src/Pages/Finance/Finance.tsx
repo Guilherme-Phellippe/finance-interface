@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Box } from "../../components/Box/Box";
 import { ChooseMonth } from "../../components/ChooseMonth/ChooseMonth";
 import { useFormat } from "../../hooks/useFormatDate";
@@ -28,8 +28,9 @@ export function Finance({ }: Finance) {
     const { currentDate } = useDate();
     const currentMonth = params.get(variableSearchParams.month);
     const date = currentMonth ? currentDate(currentMonth) : currentDate();
-    const filterDebtsCurrentMonth = debts?.filter(debt => getCurrentDebitPayment(debt) ? currentDate(getCurrentDebitPayment(debt)?.payment_in).isSame(date.toISOString(), "month") : false);
-
+    const filterDebtsCurrentMonth = debts?.filter(debt => getCurrentDebitPayment(debt) ? currentDate(getCurrentDebitPayment(debt)?.payment_in).isSame(date.toISOString(), "month") : false)
+        .sort((a, b) => currentDate(getCurrentDebitPayment(a)?.payment_in).valueOf() - currentDate(getCurrentDebitPayment(b)?.payment_in).valueOf());
+    const [selectDebt, setSelectDebit] = useState<Debts[]>();
 
     const handleDeleteDebt = async (id: string) => {
 
@@ -101,6 +102,15 @@ export function Finance({ }: Finance) {
         })
     }
 
+    const handleSelectDebts = (debt: Debts) => {
+        if(getCurrentDebitPayment(debt)?.is_paid) return;
+        if (selectDebt?.find(select => select.id === debt.id)) {
+            const removeDebt = selectDebt?.filter(select => select.id !== debt.id);
+            setSelectDebit(removeDebt.length <= 0 ? undefined : removeDebt);
+        } else {
+            setSelectDebit(values => values ? [...values, debt] : [debt])
+        }
+    }
 
 
     return (
@@ -119,34 +129,35 @@ export function Finance({ }: Finance) {
 
                     <Box
                         title="Contas hà pagar"
-                        value={`R$ ${debtsMetric(debts).debtsCurrentMonth.toFixed(2).replace(".", ",")}`}
+                        value={`R$ ${debtsMetric(selectDebt || filterDebtsCurrentMonth).debtsCurrentMonth.toFixed(2).replace(".", ",")}`}
                         isNegative
                     />
 
                     <Box
                         title="Contas total"
-                        value={`R$ ${debtsMetric(debts).debtsTotal.toFixed(2).replace(".", ",")}`}
+                        value={`R$ ${debtsMetric(selectDebt || filterDebtsCurrentMonth).debtsTotal.toFixed(2).replace(".", ",")}`}
                         isNegative
                     />
                     <Box
                         title="Objetivo diário"
-                        value={`R$ ${erningsPerDay({ debts })}/dia`}
+                        value={`R$ ${erningsPerDay({ debts: selectDebt || filterDebtsCurrentMonth })}/dia`}
                         width="w-4/5"
                         isNegative
                     />
                 </div>
 
                 {/* LISTA DE DESPESAS  */}
-                <div className="flex flex-col gap-3 max-h-[300px] w-full overflow-auto border border-slate-500 p-4 rounded-md">
+                <div className="flex flex-col gap-1 max-h-[50vh] w-full overflow-auto border border-slate-500 p-4 rounded-md">
                     {filterDebtsCurrentMonth?.map(debt =>
                         <div
                             key={debt.id}
-                            // data-isactive={new Date(debt.debts_payment[0].payment_in).getDate() <= new Date(dateToCalc).getDate()}
-                            className="w-full flex gap-2 justify-start items-center data-[isactive=false]:opacity-30"
+                            data-isselected={!!selectDebt?.find(select => select.id === debt.id)}
+                            className="w-full flex gap-2 justify-start items-center data-[isselected=true]:bg-blue-800 p-2"
                         >
                             <div
                                 data-paid={getCurrentDebitPayment(debt)?.is_paid}
-                                className="w-4 h-4 rounded-full data-[paid=true]:bg-green-900 bg-red-900"
+                                className="w-6 h-4  data-[paid=true]:bg-green-900 bg-red-900"
+                                onClick={() => handleSelectDebts(debt)}
                             ></div>
                             <span className="w-1/3 whitespace-nowrap text-ellipsis overflow-hidden">{debt.title}</span>
                             <span className="w-1/3">{formatRealValue(debt.value)}</span>

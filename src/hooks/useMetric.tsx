@@ -54,7 +54,10 @@ export function useMetric() {
         const lastDebtOfTheMonth = debtsMetric(debts).lastDebtOfTheMonth; // Busca a data do ultima dívida
         if (!lastDebtOfTheMonth) return 0;
 
-        const daysToPay = currentDate(lastDebtOfTheMonth.payment_in).date() // Dias restantes para pagar (Será acrescido um dia para que ele conte o dia atual)
+        const monthInDays = Array.from({ length: currentDate(lastDebtOfTheMonth.payment_in).month() }).reduce((total: number, _, index) => total + currentDate().subtract(index, "month").daysInMonth(),  currentDate(lastDebtOfTheMonth.payment_in).date());
+        const currentMonthInDays = Array.from({ length: currentDate().month() }).reduce((total: number, _, index) => total + currentDate().subtract(index, "month").daysInMonth(), currentDate().date());
+        const daysToPay = monthInDays - currentMonthInDays // Dias restantes para pagar (Será acrescido um dia para que ele conte o dia atual)
+        
         const balance = balanceMetric() // Busca o saldo da conta
         const debtsMinusCurrentBalance = debtsCurrentMonth - balance // Subtrai o valor total da divida com o saldo da conta
         const result = ((debtsMinusCurrentBalance / daysToPay)).toFixed(2).replace(".", ",");

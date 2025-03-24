@@ -6,5 +6,5 @@ export interface Debts {
     description?: string | null;
     value: number;
     debts_payment: Debts_payment[]
-    created_at: Date
+    created_at: string
 }

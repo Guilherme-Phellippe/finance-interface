@@ -16,8 +16,6 @@ export function FormAddBalance({ }: FormAddBalance) {
         const inputValue = containerInputValueRef.current?.querySelector("input");
         const value = Number(inputValue?.value) || 0;
 
-        console.log(currentBalance, value)
-
         localStorage.setItem(variablesLocalStorage.balance, (operator === "add" ? (currentBalance + value) : (currentBalance - value)).toString());
 
         setModalContent({
